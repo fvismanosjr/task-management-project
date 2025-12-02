@@ -12,7 +12,9 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource
 
 @Configuration
 @EnableMethodSecurity
-class SecurityConfig() {
+class SecurityConfig(
+    private val authFilter: AuthFilter
+) {
     @Bean
     fun securityFilterChain(http: HttpSecurity, corsConfigurationSource: CorsConfigurationSource): SecurityFilterChain = http
         .cors { it.configurationSource(corsConfigurationSource)}
@@ -26,6 +28,7 @@ class SecurityConfig() {
                 .anyRequest()
                 .authenticated()
         }
+        .addFilterBefore(authFilter, UsernamePasswordAuthenticationFilter::class.java)
         .formLogin { it.disable() }
         .httpBasic { it.disable() }
         .build()
