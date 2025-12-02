@@ -5,18 +5,27 @@ import { ref } from 'vue'
 import BoardList from '@/components/BoardList.vue';
 import AppHeader from '@/components/AppHeader.vue';
 
+const boardListKey = ref(0);
 const boardDialogKey = ref(0);
 const isBoardDialogOpen = ref(false);
 const boardDialogId = ref(0);
 
 const updateDialogStatus = (status: boolean) => {
     isBoardDialogOpen.value = status;
+    boardDialogId.value = 0;
+    boardDialogKey.value++;
 }
 
 const openDialog = (id: number) => {
     isBoardDialogOpen.value = true;
     boardDialogId.value = id;
     boardDialogKey.value++;
+}
+
+const refresh = (val: boolean) => {
+    if (val) {
+        boardListKey.value++;
+    }
 }
 
 </script>
@@ -28,11 +37,15 @@ const openDialog = (id: number) => {
             <BoardDialog
                 :id="boardDialogId"
                 :is-open="isBoardDialogOpen"
-                :key="boardDialogKey"
+                :key="`board-dialog-${boardDialogKey}`"
+                @reload-component="refresh"
                 @update:open="updateDialogStatus"
             />
 
-            <BoardList @update:open-dialog="openDialog"/>
+            <BoardList
+                :key="`board-list-${boardListKey}`"
+                @update:open-dialog="openDialog"
+            />
         </div>
     </div>
 </template>

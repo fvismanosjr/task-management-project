@@ -63,7 +63,7 @@ const loginUser = async () => {
                                 <FieldLabel for="password">
                                     Password
                                 </FieldLabel>
-                                <a href="#" class="ml-auto text-sm underline-offset-4 hover:underline">
+                                <a href="#" class="ml-auto text-sm underline-offset-4 hover:underline" tabindex="-1">
                                     Forgot your password?
                                 </a>
                             </div>

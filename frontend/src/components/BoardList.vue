@@ -16,8 +16,10 @@ import {
 
 import { Button } from '@/components/ui/button'
 import { ChevronRightIcon, LayoutList, Pencil } from 'lucide-vue-next'
+import ConfirmDialog from '@/components/ConfirmDialog.vue'
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
+import { getBoards } from '@/services/board';
 
 const emit = defineEmits<{
     (e: "update:open-dialog", value: number): void
@@ -28,18 +30,13 @@ interface Board {
     name: string,
 }
 
+const confirmDialogKey = ref(0);
 const router = useRouter();
+const boards = ref<Board[]>([]);
 
-const boards = ref<Board[]>([
-    {
-        id: 1,
-        name: "Sample Board"
-    },
-    {
-        id: 2,
-        name: "Other Board"
-    }
-]);
+getBoards().then((response) => {
+    boards.value = response;
+})
 
 const openBoardDialog = (id: number) => {
     emit("update:open-dialog", id);
@@ -52,6 +49,18 @@ const goToBoard = (id: number) => {
             id: id
         }
     })
+}
+
+const refresh = async (val: boolean) => {
+    if (val) {
+        boards.value = [];
+
+        await getBoards().then((response) => {
+            boards.value = response;
+        });
+
+        confirmDialogKey.value++;
+    }
 }
 </script>
 
@@ -66,6 +75,12 @@ const goToBoard = (id: number) => {
                     <Button variant="outline" size="icon-sm" @click.prevent="openBoardDialog(board.id)">
                         <Pencil />
                     </Button>
+                    <ConfirmDialog
+                        :id="board.id"
+                        :type="'board'"
+                        :key="`confirm-dialog-${board.id}-${confirmDialogKey}`"
+                        @reload-component="refresh"
+                    />
                     <Button variant="outline" size="icon-sm" @click.prevent="goToBoard(board.id)">
                         <ChevronRightIcon />
                     </Button>

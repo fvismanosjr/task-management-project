@@ -15,37 +15,39 @@ import { Label } from '@/components/ui/label'
 import { Button } from '@/components/ui/button'
 import { Plus } from "lucide-vue-next"
 import { ref } from 'vue'
+import { findBoard, saveBoard, updateBoard } from '@/services/board'
 
 const props = defineProps<{
     id?: number,
-    type?: string,
     isOpen: boolean
 }>()
 
 const emit = defineEmits<{
     (e: "update:open", value: boolean): void,
-    (e: "reload-table", value: boolean): void,
+    (e: "reload-component", value: boolean): void,
 }>();
 
 const board = ref({
     id: 0,
     name: "",
-    type: "add"
 });
 
-const submitBoard = () => {
-    // switch (props.type) {
-    //     case "delete":
-    //         deletePortfolio(portfolio.value.id);
-    //         break;
+if (props.id) {
+    findBoard(props.id).then((response) => {
+        board.value = response;
+    })
+}
 
-    //     default:
-    //         savePortfolio(portfolio.value);
-    //         break;
-    // }
+const submitBoard = async () => {
+
+    if (props.id) {
+        await updateBoard(props.id, board.value)
+    } else {
+        await saveBoard(board.value);
+    }
 
     emit("update:open", false);
-    emit("reload-table", true);
+    emit("reload-component", true);
 }
 </script>
 
@@ -69,7 +71,6 @@ const submitBoard = () => {
                         id="name-1"
                         name="name"
                         placeholder="Board name"
-                        :disabled="props.type == 'delete'"
                     />
                 </div>
             </div>

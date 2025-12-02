@@ -16,7 +16,7 @@ import {
 
 import { Button } from '@/components/ui/button'
 import { LayoutList, Pencil } from 'lucide-vue-next'
-import ConfigmDialog from '@/components/ConfigmDialog.vue'
+import ConfirmDialog from '@/components/ConfirmDialog.vue'
 import TaskDialog from '@/components/TaskDialog.vue'
 import { ref } from 'vue';
 
@@ -52,7 +52,7 @@ const tasks = ref<Task[]>([
                         <Button variant="outline" size="icon-sm">
                             <Pencil />
                         </Button>
-                        <ConfigmDialog />
+                        <ConfirmDialog />
                     </ItemActions>
                 </Item>
             </template>

@@ -26,7 +26,7 @@ const props = defineProps<{
 
 const emit = defineEmits<{
     (e: "update:open", value: boolean): void,
-    (e: "reload-table", value: boolean): void,
+    (e: "reload-component", value: boolean): void,
 }>();
 
 const task = ref({
@@ -47,7 +47,7 @@ const submitTask = () => {
     // }
 
     emit("update:open", false);
-    emit("reload-table", true);
+    emit("reload-component", true);
 }
 </script>
 
