@@ -19,3 +19,9 @@ data class TaskResponse(
     val comment: String?,
     val assignee: Long,
 )
+
+// for socket
+data class TaskDto(
+    val id: Long,
+    val title: String,
+)

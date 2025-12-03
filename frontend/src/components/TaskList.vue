@@ -17,25 +17,28 @@ import {
 import { Button } from '@/components/ui/button'
 import { LayoutList, Pencil } from 'lucide-vue-next'
 import ConfirmDialog from '@/components/ConfirmDialog.vue'
-import { ref } from 'vue';
+import { onUnmounted, ref } from 'vue';
 import { useRoute } from 'vue-router'
 import { getTasks } from '@/services/task'
+import SocketService from '@/services/socket'
+import type { TaskType } from '@/lib/types';
 
 const emit = defineEmits<{
     (e: "update:open-dialog", value: number): void
 }>();
 
-interface Task {
-    id: number,
-    title: string,
-}
-
 const route = useRoute();
 const confirmDialogKey = ref(0);
-const tasks = ref<Task[]>([]);
+const tasks = ref<TaskType[]>([]);
 
 getTasks(Number(route.params.id)).then((response) => {
     tasks.value = response;
+
+    SocketService.connect(() => {
+        SocketService.subscribeToTasks(Number(route.params.id), (newTasks: TaskType[]) => {
+            tasks.value = newTasks;
+        });
+    });
 })
 
 const openTaskDialog = (id: number) => {
@@ -53,6 +56,10 @@ const refresh = async (val: boolean) => {
         confirmDialogKey.value++;
     }
 }
+
+onUnmounted(() => {
+    SocketService.disconnect();
+})
 </script>
 
 <template>

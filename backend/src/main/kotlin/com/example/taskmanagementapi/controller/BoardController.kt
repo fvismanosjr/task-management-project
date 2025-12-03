@@ -82,5 +82,7 @@ class BoardController(
     fun taskDestroy(
         @PathVariable id: Long,
         @PathVariable taskId: Long,
-    ) = boardService.destroyTask(taskId)
+    ) = boardService.destroyTask(id, taskId)
+
+
 }

@@ -1,8 +1,10 @@
 package com.example.taskmanagementapi.service
 
+import com.example.taskmanagementapi.controller.SocketController
 import com.example.taskmanagementapi.dto.BoardRequest
 import com.example.taskmanagementapi.dto.BoardResponse
 import com.example.taskmanagementapi.dto.BoardResponseWithMembers
+import com.example.taskmanagementapi.dto.TaskDto
 import com.example.taskmanagementapi.dto.TaskRequest
 import com.example.taskmanagementapi.dto.TaskResponse
 import com.example.taskmanagementapi.entity.Board
@@ -20,7 +22,7 @@ class BoardService(
     private val boardMemberRepository: BoardMemberRepository,
     private val userRepository: UserRepository,
     private val taskRepository: TaskRepository,
-
+    private val socketController: SocketController,
 ) {
     fun findTaskById(
         id: Long
@@ -57,28 +59,82 @@ class BoardService(
             )
         )
 
-        val users = userRepository
-                    .findByUsernameIn(request.members)
-                    .map {
-                        BoardMember(board = board, user = it)
-                    };
+        val boardMembers = userRepository
+                            .findByUsernameIn(request.members)
+                            .map {
+                                BoardMember(board = board, user = it)
+                            }
 
         boardMemberRepository.saveAll(
-            users
+            boardMembers
         )
+
+        // broadcast
+        boardMembers.forEach { member ->
+            val boardByUser = userRepository
+                            .findById(member.user.id)
+                            .map { it.toResponseWithBoards() }
+                            .orElseThrow { Exception("not found") }
+            
+            println("userId: ${member.user.id}")
+            socketController.broadcastUserBoards(member.user.id, boardByUser.boards)
+        }
 
         return board.toResponse()
     }
 
-    fun edit(id: Long, request: BoardRequest) = boardRepository.save(
-        findById(id).apply {
-            this.name = request.name
-        }
-    )
+    fun edit(id: Long, request: BoardRequest): BoardResponse {
 
-    fun destroy(id: Long) = boardRepository.delete(
-        findById(id)
-    )
+        val board = boardRepository.findById(id).orElseThrow()
+        val users = userRepository.findByUsernameIn(request.members)
+
+        val currentUsers = board.members.map { it.user }
+        val toRemove = board.members.filter { it.user !in users }
+        board.members.removeAll(toRemove)
+
+        val existingUserIds = currentUsers.map { it.id }.toSet()
+        val toAdd = users.filter { it.id !in existingUserIds }
+
+        toAdd.forEach { user ->
+            board.members.add(BoardMember(board = board, user = user))
+        }
+
+        board.name = request.name
+        boardRepository.save(board)
+
+        // broadcast
+        users.forEach { user ->
+            val boardByUser = userRepository
+                                .findById(user.id)
+                                .map { it.toResponseWithBoards() }
+                                .orElseThrow { Exception("not found") }
+
+            println("userId: ${user.id}")
+            socketController.broadcastUserBoards(user.id, boardByUser.boards)
+        }
+
+        return board.toResponse()
+    }
+
+    fun destroy(id: Long) {
+        val board = findById(id)
+        val members = board.members
+
+        boardRepository.delete(
+            findById(id)
+        )
+
+        // broadcast
+        members.forEach { member ->
+            val boardByUser = userRepository
+                                .findById(member.user.id)
+                                .map { it.toResponseWithBoards() }
+                                .orElseThrow { Exception("not found") }
+
+            println("userId: ${member.user.id}")
+            socketController.broadcastUserBoards(member.user.id, boardByUser.boards)
+        }
+    }
 
     fun findAllTasks(
         id: Long
@@ -95,14 +151,27 @@ class BoardService(
         id: Long,
         request: TaskRequest
     ): TaskResponse {
-        return taskRepository.save(
+
+        val board = findById(id)
+        val task = taskRepository.save(
             Task(
-                board = findById(id),
+                board = board,
                 title = request.title,
                 assignee = findMemberById(request.assignee),
                 comment = request.comment
             )
-        ).toResponse()
+        )
+
+        // broadcast
+        println("broadcasting save task")
+        socketController.broadcastBoardTasks(id, board.tasks.map {
+            TaskDto(
+                it.id,
+                it.title
+            )
+        })
+
+        return task.toResponse()
     }
 
     fun updateTask(
@@ -110,17 +179,40 @@ class BoardService(
         taskId: Long,
         request: TaskRequest
     ): TaskResponse {
-        return taskRepository.save(
+        val board = findById(id)
+        val task =  taskRepository.save(
             findTaskById(taskId).apply {
-                board = findById(id)
-                title = request.title
-                assignee = findMemberById(request.assignee)
-                comment = request.comment
+                this.board = board
+                this.title = request.title
+                this.assignee = findMemberById(request.assignee)
+                this.comment = request.comment
             }
-        ).toResponse()
+        )
+
+        // broadcast
+        println("broadcasting edit task")
+        socketController.broadcastBoardTasks(id, board.tasks.map {
+            TaskDto(
+                it.id,
+                it.title
+            )
+        })
+
+        return task.toResponse()
     }
 
-    fun destroyTask(id: Long) = taskRepository.delete(
-        findTaskById(id)
-    )
+    fun destroyTask(id: Long, taskId: Long) {
+        val board = findById(id)
+
+        taskRepository.delete(findTaskById(taskId))
+
+        // broadcast
+        println("broadcasting delete task")
+        socketController.broadcastBoardTasks(id, board.tasks.map {
+            TaskDto(
+                it.id,
+                it.title
+            )
+        })
+    }
 }

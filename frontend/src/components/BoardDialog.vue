@@ -15,6 +15,7 @@ import { Label } from '@/components/ui/label'
 import { Button } from '@/components/ui/button'
 import { Plus } from "lucide-vue-next"
 import BoardMemberSelect from '@/components/BoardMemberSelect.vue'
+import type { BoardMemberType, BoardWithMembersType } from '@/lib/types'
 import { ref } from 'vue'
 import { findBoard, saveBoard, updateBoard } from '@/services/board'
 import type { AcceptableValue } from 'reka-ui'
@@ -29,15 +30,17 @@ const emit = defineEmits<{
     (e: "reload-component", value: boolean): void,
 }>();
 
-const board = ref({
+const board = ref<BoardWithMembersType>({
     id: 0,
-    name: "",
-    members: [""],
+    name: '',
+    members: []
 });
 
 if (props.id) {
     findBoard(props.id).then((response) => {
-        board.value = response;
+        board.value.id = response.id;
+        board.value.name = response.name;
+        board.value.members = response.members.map((member: BoardMemberType) => member.username);
     })
 }
 
@@ -83,6 +86,7 @@ const submitBoard = async () => {
                 <div class="grid gap-3">
                     <Label for="members">Member</Label>
                     <BoardMemberSelect
+                        :members="board.members"
                         @update:model-value="selectedMembers"
                     />
                 </div>

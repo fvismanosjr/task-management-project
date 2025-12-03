@@ -38,19 +38,26 @@ const emit = defineEmits<{
     (e: "update:model-value", value: AcceptableValue): void,
 }>();
 
+const props = defineProps<{
+    members?: string[]
+}>()
+
 interface UserMember {
     id: number,
     username: string,
 }
 
 const userMembers = ref<UserMember[]>([]);
-
-const selectedMembers = ref([]);
+const selectedMembers = ref<string[]>([]);
 const searchTerm = ref('')
 const open = ref(false)
 
 getUserMembers().then((response) => {
     userMembers.value = response;
+
+    if (props.members?.length && userMembers.value.length) {
+        selectedMembers.value = props.members;
+    }
 })
 
 const { contains } = useFilter({ sensitivity: 'base' })

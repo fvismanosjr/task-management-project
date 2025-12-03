@@ -23,7 +23,7 @@ class SecurityConfig(
             auth
                 .requestMatchers(
                     "/auth/**",
-                    "/ws-chat/**"
+                    "/ws-task-mnagement/**"
                 ).permitAll()
                 .anyRequest()
                 .authenticated()

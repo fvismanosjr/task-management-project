@@ -3,6 +3,7 @@ package com.example.taskmanagementapi.entity
 import com.example.taskmanagementapi.dto.BoardMemberResponse
 import com.example.taskmanagementapi.dto.BoardResponse
 import com.example.taskmanagementapi.dto.BoardResponseWithMembers
+import jakarta.persistence.CascadeType
 import jakarta.persistence.Column
 import jakarta.persistence.Entity
 import jakarta.persistence.FetchType
@@ -22,10 +23,10 @@ class Board(
     @Column(name = "name", nullable = false)
     var name: String,
 
-    @OneToMany(mappedBy = "board", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "board", fetch = FetchType.LAZY, cascade = [CascadeType.ALL])
     var members: MutableList<BoardMember> = mutableListOf(),
 
-    @OneToMany(mappedBy = "board", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "board", fetch = FetchType.LAZY, cascade = [CascadeType.ALL])
     var tasks: MutableList<Task> = mutableListOf()
 ) {
     fun toResponse(): BoardResponse {

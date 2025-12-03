@@ -17,25 +17,22 @@ import {
 import { Button } from '@/components/ui/button'
 import { ChevronRightIcon, LayoutList, Pencil } from 'lucide-vue-next'
 import ConfirmDialog from '@/components/ConfirmDialog.vue'
-import { ref } from 'vue';
+import type { BoardType } from '@/lib/types';
+import { onUnmounted, ref } from 'vue';
 import { useRouter } from 'vue-router';
 import { getBoards } from '@/services/board';
 import { useUserStore } from "@/stores/user"
 import { findMember } from '@/services/boardMember'
+import SocketService from '@/services/socket'
 
 const user = useUserStore();
 const emit = defineEmits<{
     (e: "update:open-dialog", value: number): void
 }>();
 
-interface Board {
-    id: number,
-    name: string,
-}
-
 const confirmDialogKey = ref(0);
 const router = useRouter();
-const boards = ref<Board[]>([]);
+const boards = ref<BoardType[]>([]);
 
 if (user.isOwner) {
     getBoards().then((response) => {
@@ -44,9 +41,14 @@ if (user.isOwner) {
 } else {
     findMember(user.user.id).then((response) => {
         boards.value = response.boards;
+
+        SocketService.connect(() => {
+            SocketService.subscribeToUserBoards(user.user.id, (newBoards: BoardType[]) => {
+                boards.value = newBoards;
+            });
+        });
     })
 }
-
 
 const openBoardDialog = (id: number) => {
     emit("update:open-dialog", id);
@@ -72,6 +74,10 @@ const refresh = async (val: boolean) => {
         confirmDialogKey.value++;
     }
 }
+
+onUnmounted(() => {
+    SocketService.disconnect();
+})
 </script>
 
 <template>
