@@ -1,5 +1,6 @@
 package com.example.taskmanagementapi.entity
 
+import com.example.taskmanagementapi.dto.TaskResponse
 import jakarta.persistence.Column
 import jakarta.persistence.Entity
 import jakarta.persistence.FetchType
@@ -24,6 +25,17 @@ class Task(
     @Column(name = "title")
     var title: String,
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "board_member_id", nullable = false)
+    var assignee: BoardMember,
+
     @Column(name = "comment", columnDefinition = "TEXT")
-    var comment: String,
-)
+    var comment: String?,
+) {
+    fun toResponse(): TaskResponse {
+        return TaskResponse(
+            this.id,
+            this.title
+        )
+    }
+}

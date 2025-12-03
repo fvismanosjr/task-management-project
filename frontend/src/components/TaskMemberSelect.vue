@@ -8,14 +8,22 @@ import {
     SelectTrigger,
     SelectValue,
 } from '@/components/ui/select'
+
+import { findBoard } from '@/services/board';
+import { useRoute } from 'vue-router';
 import { ref } from 'vue';
 
+const route = useRoute();
 const members = ref([
     {
-        id: 1,
-        username: "fvismanos"
+        id: 0,
+        username: ""
     }
 ])
+
+findBoard(Number(route.params.id)).then((response) => {
+    members.value = response.members;
+})
 </script>
 
 <template>

@@ -16,11 +16,12 @@ import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'
 import { Plus } from "lucide-vue-next"
 import TaskMemberSelect from '@/components/TaskMemberSelect.vue'
+import { saveTask } from '@/services/task'
 import { ref } from 'vue'
+import { useRoute } from 'vue-router'
 
 const props = defineProps<{
     id?: number,
-    type?: string,
     isOpen: boolean
 }>()
 
@@ -29,22 +30,20 @@ const emit = defineEmits<{
     (e: "reload-component", value: boolean): void,
 }>();
 
+const route = useRoute();
 const task = ref({
     id: 0,
     title: "",
     comment: "",
+    assignee: "",
 });
 
-const submitTask = () => {
-    // switch (props.type) {
-    //     case "delete":
-    //         deletePortfolio(portfolio.value.id);
-    //         break;
-
-    //     default:
-    //         savePortfolio(portfolio.value);
-    //         break;
-    // }
+const submitTask = async () => {
+    if (props.id) {
+        // await updateTask(props.id, board.value)
+    } else {
+        await saveTask(Number(route.params.id), task.value);
+    }
 
     emit("update:open", false);
     emit("reload-component", true);
@@ -71,12 +70,11 @@ const submitTask = () => {
                         id="title"
                         name="title"
                         placeholder="Title name"
-                        :disabled="props.type == 'delete'"
                     />
                 </div>
                 <div class="grid gap-3">
                     <Label for="assignee">Assignee</Label>
-                    <TaskMemberSelect/>
+                    <TaskMemberSelect v-model:model-value="task.assignee"/>
                 </div>
                 <div class="grid gap-3">
                     <Label for="comment">Comment</Label>

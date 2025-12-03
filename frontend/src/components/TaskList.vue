@@ -17,31 +17,46 @@ import {
 import { Button } from '@/components/ui/button'
 import { LayoutList, Pencil } from 'lucide-vue-next'
 import ConfirmDialog from '@/components/ConfirmDialog.vue'
-import TaskDialog from '@/components/TaskDialog.vue'
 import { ref } from 'vue';
+import { useRoute } from 'vue-router'
+import { getTasks } from '@/services/task'
+
+const emit = defineEmits<{
+    (e: "update:open-dialog", value: number): void
+}>();
 
 interface Task {
     id: number,
     title: string,
 }
 
-const isTaskDialogOpen = ref(false);
+const route = useRoute();
+const confirmDialogKey = ref(0);
+const tasks = ref<Task[]>([]);
 
-const tasks = ref<Task[]>([
-    {
-        id: 1,
-        title: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aliquam placerat sapien ac aliquam varius."
-    },
-    {
-        id: 2,
-        title: "Other Board"
+getTasks(Number(route.params.id)).then((response) => {
+    tasks.value = response;
+})
+
+const openTaskDialog = (id: number) => {
+    emit("update:open-dialog", id);
+}
+
+const refresh = async (val: boolean) => {
+    if (val) {
+        tasks.value = [];
+
+        await getTasks(Number(route.params.id)).then((response) => {
+            tasks.value = response;
+        });
+
+        confirmDialogKey.value++;
     }
-]);
+}
 </script>
 
 <template>
-    <div class="flex w-full max-w-lg mx-auto flex-col gap-3">
-        <TaskDialog :is-open="isTaskDialogOpen" @update:open="(val) => isTaskDialogOpen = val"/>
+    <div class="flex w-full flex-col gap-3">
         <template v-if="tasks.length">
             <template v-for="task in tasks" :key="`task-${task.id}`">
                 <Item variant="outline">
@@ -49,10 +64,15 @@ const tasks = ref<Task[]>([
                         <ItemTitle>{{ task.title }}</ItemTitle>
                     </ItemContent>
                     <ItemActions>
-                        <Button variant="outline" size="icon-sm">
+                        <Button variant="outline" size="icon-sm" @click.prevent="openTaskDialog(task.id)">
                             <Pencil />
                         </Button>
-                        <ConfirmDialog />
+                        <ConfirmDialog
+                            :id="task.id"
+                            :type="'task'"
+                            :key="`confirm-dialog-${task.id}-${confirmDialogKey}`"
+                            @reload-component="refresh"
+                        />
                     </ItemActions>
                 </Item>
             </template>

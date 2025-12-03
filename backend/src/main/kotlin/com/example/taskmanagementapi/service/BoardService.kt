@@ -3,18 +3,23 @@ package com.example.taskmanagementapi.service
 import com.example.taskmanagementapi.dto.BoardRequest
 import com.example.taskmanagementapi.dto.BoardResponse
 import com.example.taskmanagementapi.dto.BoardResponseWithMembers
+import com.example.taskmanagementapi.dto.TaskRequest
+import com.example.taskmanagementapi.dto.TaskResponse
 import com.example.taskmanagementapi.entity.Board
 import com.example.taskmanagementapi.entity.BoardMember
+import com.example.taskmanagementapi.entity.Task
 import com.example.taskmanagementapi.repository.BoardMemberRepository
 import com.example.taskmanagementapi.repository.BoardRepository
+import com.example.taskmanagementapi.repository.TaskRepository
 import com.example.taskmanagementapi.repository.UserRepository
 import org.springframework.stereotype.Service
 
 @Service
 class BoardService(
     private val boardRepository: BoardRepository,
-    private val userRepository: UserRepository,
     private val boardMemberRepository: BoardMemberRepository,
+    private val userRepository: UserRepository,
+    private val taskRepository: TaskRepository,
 
 ) {
     fun findById(
@@ -62,4 +67,26 @@ class BoardService(
     fun destroy(id: Long) = boardRepository.delete(
         findById(id)
     )
+
+    fun findAllTasks(
+        id: Long
+    ) = taskRepository.findAllByBoardId(id).map { it.toResponse() }
+
+    fun findTask(
+        id: Long,
+        taskId: Long,
+    ) = taskRepository.findById(taskId)
+
+//    fun saveTask(
+//        id: Long,
+//        request: TaskRequest
+//    ): TaskResponse {
+//        return taskRepository.save(
+//            Task(
+//                board = findById(id),
+//                title = request.title,
+//                comment = request.comment
+//            )
+//        ).toResponse()
+//    }
 }

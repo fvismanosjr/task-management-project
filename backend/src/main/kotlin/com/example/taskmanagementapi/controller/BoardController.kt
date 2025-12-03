@@ -1,6 +1,7 @@
 package com.example.taskmanagementapi.controller
 
 import com.example.taskmanagementapi.dto.BoardRequest
+import com.example.taskmanagementapi.dto.TaskRequest
 import com.example.taskmanagementapi.service.BoardService
 import jakarta.validation.Valid
 import org.springframework.http.HttpStatus
@@ -47,4 +48,24 @@ class BoardController(
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     fun destroy(@PathVariable id: Long) = boardService.destroy(id)
+
+    @GetMapping("/{id}/tasks")
+    @ResponseStatus(HttpStatus.OK)
+    fun findAllTasks(
+        @PathVariable id: Long,
+    ) = boardService.findAllTasks(id)
+
+    @GetMapping("/{id}/tasks/{taskId}")
+    @ResponseStatus(HttpStatus.OK)
+    fun findTask(
+        @PathVariable id: Long,
+        @PathVariable taskId: Long,
+    ) = boardService.findTask(id, taskId)
+
+//    @PostMapping("/{id}/tasks")
+//    @ResponseStatus(HttpStatus.CREATED)
+//    fun taskStore(
+//        @PathVariable id: Long,
+//        @Valid @RequestBody request: TaskRequest
+//    ) = boardService.saveTask(id, request)
 }
