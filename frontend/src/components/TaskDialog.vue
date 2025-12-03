@@ -16,7 +16,7 @@ import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'
 import { Plus } from "lucide-vue-next"
 import TaskMemberSelect from '@/components/TaskMemberSelect.vue'
-import { saveTask } from '@/services/task'
+import { findTask, saveTask, updateTask } from '@/services/task'
 import { ref } from 'vue'
 import { useRoute } from 'vue-router'
 
@@ -31,18 +31,25 @@ const emit = defineEmits<{
 }>();
 
 const route = useRoute();
+const routeId = Number(route.params.id);
 const task = ref({
     id: 0,
     title: "",
     comment: "",
-    assignee: "",
+    assignee: 0,
 });
+
+if (props.id) {
+    findTask(routeId, props.id).then((response) => {
+        task.value = response;
+    })
+}
 
 const submitTask = async () => {
     if (props.id) {
-        // await updateTask(props.id, board.value)
+        await updateTask(routeId, props.id, task.value)
     } else {
-        await saveTask(Number(route.params.id), task.value);
+        await saveTask(routeId, task.value);
     }
 
     emit("update:open", false);

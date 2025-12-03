@@ -22,6 +22,18 @@ class BoardService(
     private val taskRepository: TaskRepository,
 
 ) {
+    fun findTaskById(
+        id: Long
+    ): Task = taskRepository
+        .findById(id)
+        .orElseThrow { Exception("not found") }
+
+    fun findMemberById(
+        id: Long
+    ): BoardMember = boardMemberRepository
+                        .findById(id)
+                        .orElseThrow { Exception("not found") }
+
     fun findById(
         id: Long
     ): Board = boardRepository
@@ -73,20 +85,42 @@ class BoardService(
     ) = taskRepository.findAllByBoardId(id).map { it.toResponse() }
 
     fun findTask(
+        id: Long
+    ): TaskResponse = taskRepository
+                        .findById(id)
+                        .map { it.toResponse() }
+                        .orElseThrow { Exception("task not found") }
+
+    fun saveTask(
+        id: Long,
+        request: TaskRequest
+    ): TaskResponse {
+        return taskRepository.save(
+            Task(
+                board = findById(id),
+                title = request.title,
+                assignee = findMemberById(request.assignee),
+                comment = request.comment
+            )
+        ).toResponse()
+    }
+
+    fun updateTask(
         id: Long,
         taskId: Long,
-    ) = taskRepository.findById(taskId)
+        request: TaskRequest
+    ): TaskResponse {
+        return taskRepository.save(
+            findTaskById(taskId).apply {
+                board = findById(id)
+                title = request.title
+                assignee = findMemberById(request.assignee)
+                comment = request.comment
+            }
+        ).toResponse()
+    }
 
-//    fun saveTask(
-//        id: Long,
-//        request: TaskRequest
-//    ): TaskResponse {
-//        return taskRepository.save(
-//            Task(
-//                board = findById(id),
-//                title = request.title,
-//                comment = request.comment
-//            )
-//        ).toResponse()
-//    }
+    fun destroyTask(id: Long) = taskRepository.delete(
+        findTaskById(id)
+    )
 }

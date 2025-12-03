@@ -13,7 +13,9 @@ import {
 
 import { Button } from '@/components/ui/button'
 import { deleteBoard } from '@/services/board';
+import { deleteTask } from '@/services/task';
 import { X } from 'lucide-vue-next'
+import { useRoute } from 'vue-router';
 
 const props = defineProps<{
     id: number,
@@ -24,10 +26,17 @@ const emit = defineEmits<{
     (e: "reload-component", value: boolean): void,
 }>();
 
+const route = useRoute();
+const routeId = Number(route.params.id);
+
 const submit = async () => {
     switch (props.type) {
         case "board":
-            await deleteBoard(props.id)
+            await deleteBoard(props.id);
+            break;
+
+        case "task":
+            await deleteTask(routeId, props.id);
             break;
     }
 

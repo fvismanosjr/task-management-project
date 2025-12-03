@@ -35,7 +35,7 @@ export const saveBoard = async (board: BoardRequest) => {
     });
 }
 
-export const updateBoard = async (id:number, board: BoardRequest) => {
+export const updateBoard = async (id: number, board: BoardRequest) => {
     return await fetch(`${BOARD_API_URL}/${id}`, {
         method: "PUT",
         headers: {

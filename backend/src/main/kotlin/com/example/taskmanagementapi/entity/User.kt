@@ -2,7 +2,6 @@ package com.example.taskmanagementapi.entity
 
 import com.example.taskmanagementapi.dto.UserResponse
 import com.example.taskmanagementapi.dto.UserResponseWithBoards
-import com.example.taskmanagementapi.dto.UserResponseWithMember
 import jakarta.persistence.Column
 import jakarta.persistence.Entity
 import jakarta.persistence.FetchType

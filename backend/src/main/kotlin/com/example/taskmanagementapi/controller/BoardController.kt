@@ -60,12 +60,27 @@ class BoardController(
     fun findTask(
         @PathVariable id: Long,
         @PathVariable taskId: Long,
-    ) = boardService.findTask(id, taskId)
+    ) = boardService.findTask(taskId)
 
-//    @PostMapping("/{id}/tasks")
-//    @ResponseStatus(HttpStatus.CREATED)
-//    fun taskStore(
-//        @PathVariable id: Long,
-//        @Valid @RequestBody request: TaskRequest
-//    ) = boardService.saveTask(id, request)
+    @PostMapping("/{id}/tasks")
+    @ResponseStatus(HttpStatus.CREATED)
+    fun taskStore(
+        @PathVariable id: Long,
+        @Valid @RequestBody request: TaskRequest
+    ) = boardService.saveTask(id, request)
+
+    @PutMapping("/{id}/tasks/{taskId}")
+    @ResponseStatus(HttpStatus.OK)
+    fun taskUpdate(
+        @PathVariable id: Long,
+        @PathVariable taskId: Long,
+        @Valid @RequestBody request: TaskRequest
+    ) = boardService.updateTask(id, taskId, request)
+
+    @DeleteMapping("/{id}/tasks/{taskId}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    fun taskDestroy(
+        @PathVariable id: Long,
+        @PathVariable taskId: Long,
+    ) = boardService.destroyTask(taskId)
 }

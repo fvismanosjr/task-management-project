@@ -35,7 +35,9 @@ class Task(
     fun toResponse(): TaskResponse {
         return TaskResponse(
             this.id,
-            this.title
+            this.title,
+            this.comment,
+            this.assignee.id
         )
     }
 }
