@@ -1,5 +1,8 @@
 package com.example.taskmanagementapi.entity
 
+import com.example.taskmanagementapi.dto.BoardMemberResponse
+import com.example.taskmanagementapi.dto.BoardResponse
+import com.example.taskmanagementapi.dto.BoardResponseWithMembers
 import jakarta.persistence.Column
 import jakarta.persistence.Entity
 import jakarta.persistence.FetchType
@@ -24,4 +27,24 @@ class Board(
 
     @OneToMany(mappedBy = "board", fetch = FetchType.LAZY)
     var tasks: MutableList<Task> = mutableListOf()
-)
+) {
+    fun toResponse(): BoardResponse {
+        return BoardResponse(
+            this.id,
+            this.name
+        )
+    }
+
+    fun toResponseWithMembers(): BoardResponseWithMembers {
+        return BoardResponseWithMembers(
+            this.id,
+            this.name,
+            this.members.map {
+                BoardMemberResponse(
+                    it.id,
+                    it.user.username
+                )
+            }
+        )
+    }
+}

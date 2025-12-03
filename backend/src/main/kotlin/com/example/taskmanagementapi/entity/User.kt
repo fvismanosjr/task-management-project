@@ -1,5 +1,6 @@
 package com.example.taskmanagementapi.entity
 
+import com.example.taskmanagementapi.dto.UserResponse
 import jakarta.persistence.Column
 import jakarta.persistence.Entity
 import jakarta.persistence.GeneratedValue
@@ -22,4 +23,11 @@ class User(
 
     @Column(name = "role")
     var role: String,
-)
+) {
+    fun toResponse(): UserResponse {
+        return UserResponse(
+            this.id,
+            this.username
+        )
+    }
+}

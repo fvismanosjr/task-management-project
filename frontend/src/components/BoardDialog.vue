@@ -14,8 +14,10 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Button } from '@/components/ui/button'
 import { Plus } from "lucide-vue-next"
+import BoardMemberSelect from '@/components/BoardMemberSelect.vue'
 import { ref } from 'vue'
 import { findBoard, saveBoard, updateBoard } from '@/services/board'
+import type { AcceptableValue } from 'reka-ui'
 
 const props = defineProps<{
     id?: number,
@@ -30,12 +32,17 @@ const emit = defineEmits<{
 const board = ref({
     id: 0,
     name: "",
+    members: [""],
 });
 
 if (props.id) {
     findBoard(props.id).then((response) => {
         board.value = response;
     })
+}
+
+const selectedMembers = (val: AcceptableValue) => {
+    board.value.members = Array.isArray(val) ? val : [];
 }
 
 const submitBoard = async () => {
@@ -71,6 +78,12 @@ const submitBoard = async () => {
                         id="name-1"
                         name="name"
                         placeholder="Board name"
+                    />
+                </div>
+                <div class="grid gap-3">
+                    <Label for="members">Member</Label>
+                    <BoardMemberSelect
+                        @update:model-value="selectedMembers"
                     />
                 </div>
             </div>
