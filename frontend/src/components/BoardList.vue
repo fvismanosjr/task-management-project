@@ -20,7 +20,10 @@ import ConfirmDialog from '@/components/ConfirmDialog.vue'
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
 import { getBoards } from '@/services/board';
+import { useUserStore } from "@/stores/user"
+import { findMember } from '@/services/boardMember'
 
+const user = useUserStore();
 const emit = defineEmits<{
     (e: "update:open-dialog", value: number): void
 }>();
@@ -34,9 +37,16 @@ const confirmDialogKey = ref(0);
 const router = useRouter();
 const boards = ref<Board[]>([]);
 
-getBoards().then((response) => {
-    boards.value = response;
-})
+if (user.isOwner) {
+    getBoards().then((response) => {
+        boards.value = response;
+    })
+} else {
+    findMember(user.user.id).then((response) => {
+        boards.value = response.boards;
+    })
+}
+
 
 const openBoardDialog = (id: number) => {
     emit("update:open-dialog", id);
@@ -72,15 +82,17 @@ const refresh = async (val: boolean) => {
                     <ItemTitle>{{ board.name }}</ItemTitle>
                 </ItemContent>
                 <ItemActions>
-                    <Button variant="outline" size="icon-sm" @click.prevent="openBoardDialog(board.id)">
-                        <Pencil />
-                    </Button>
-                    <ConfirmDialog
-                        :id="board.id"
-                        :type="'board'"
-                        :key="`confirm-dialog-${board.id}-${confirmDialogKey}`"
-                        @reload-component="refresh"
-                    />
+                    <template v-if="user.isOwner">
+                        <Button variant="outline" size="icon-sm" @click.prevent="openBoardDialog(board.id)">
+                            <Pencil />
+                        </Button>
+                        <ConfirmDialog
+                            :id="board.id"
+                            :type="'board'"
+                            :key="`confirm-dialog-${board.id}-${confirmDialogKey}`"
+                            @reload-component="refresh"
+                        />
+                    </template>
                     <Button variant="outline" size="icon-sm" @click.prevent="goToBoard(board.id)">
                         <ChevronRightIcon />
                     </Button>

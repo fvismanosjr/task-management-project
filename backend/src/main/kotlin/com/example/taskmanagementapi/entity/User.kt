@@ -1,11 +1,15 @@
 package com.example.taskmanagementapi.entity
 
 import com.example.taskmanagementapi.dto.UserResponse
+import com.example.taskmanagementapi.dto.UserResponseWithBoards
+import com.example.taskmanagementapi.dto.UserResponseWithMember
 import jakarta.persistence.Column
 import jakarta.persistence.Entity
+import jakarta.persistence.FetchType
 import jakarta.persistence.GeneratedValue
 import jakarta.persistence.GenerationType
 import jakarta.persistence.Id
+import jakarta.persistence.OneToMany
 import jakarta.persistence.Table
 
 @Entity
@@ -23,11 +27,25 @@ class User(
 
     @Column(name = "role")
     var role: String,
+
+    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
+    var boardMember: MutableList<BoardMember> = mutableListOf()
+
 ) {
     fun toResponse(): UserResponse {
         return UserResponse(
             this.id,
             this.username
+        )
+    }
+
+    fun toResponseWithBoards(): UserResponseWithBoards {
+        return UserResponseWithBoards(
+            this.id,
+            this.username,
+            boards = this.boardMember.map {
+                it.board.toResponse()
+            }
         )
     }
 }

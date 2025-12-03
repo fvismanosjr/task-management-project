@@ -1,5 +1,6 @@
 package com.example.taskmanagementapi.entity
 
+import com.example.taskmanagementapi.dto.BoardMemberResponse
 import jakarta.persistence.Entity
 import jakarta.persistence.FetchType
 import jakarta.persistence.GeneratedValue
@@ -23,4 +24,11 @@ class BoardMember(
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
     var user: User,
-)
+) {
+    fun toResponse(): BoardMemberResponse {
+        return BoardMemberResponse(
+            this.id,
+            this.user.username
+        )
+    }
+}

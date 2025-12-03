@@ -1,5 +1,6 @@
 package com.example.taskmanagementapi.dto
 
+import com.example.taskmanagementapi.entity.BoardMember
 import jakarta.validation.constraints.AssertTrue
 import jakarta.validation.constraints.NotBlank
 
@@ -36,4 +37,10 @@ data class LoginResponse(
 data class UserResponse(
     val id: Long,
     val username: String,
+)
+
+data class UserResponseWithBoards(
+    val id: Long,
+    val username: String,
+    val boards: List<BoardResponse>
 )

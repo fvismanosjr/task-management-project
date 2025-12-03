@@ -2,12 +2,14 @@
 import { Button } from '@/components/ui/button'
 import { logout } from '@/services/auth';
 import { useRouter } from 'vue-router';
+import { useUserStore } from "@/stores/user";
 
+const user = useUserStore();
 const router = useRouter();
 const logoutUser = async () => {
-    await logout().then(() => {
-        router.push({ name: "login" });
-    });
+    await logout();
+    user.destroy();
+    router.push({ name: "login" });
 }
 </script>
 

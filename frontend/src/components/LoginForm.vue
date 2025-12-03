@@ -19,7 +19,9 @@ import { Button } from "@/components/ui/button"
 import { ref } from "vue"
 import { login } from "@/services/auth"
 import { useRouter } from 'vue-router';
+import { useUserStore } from "@/stores/user"
 
+const user = useUserStore();
 const router = useRouter();
 
 const loginForm = ref({
@@ -31,6 +33,15 @@ const loginUser = async () => {
     const response = await login(loginForm.value);
 
     if (response.ok) {
+        const result = await response.json();
+        const payload = {
+            id: result.id,
+            username: result.name,
+            role: result.role,
+        }
+
+        user.save(payload);
+
         router.push({
             name: "dashboard",
         });

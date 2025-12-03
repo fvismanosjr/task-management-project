@@ -1,10 +1,12 @@
 <script setup lang="ts">
 
 import BoardDialog from '@/components/BoardDialog.vue'
-import { ref } from 'vue'
 import BoardList from '@/components/BoardList.vue';
 import AppHeader from '@/components/AppHeader.vue';
+import { useUserStore } from "@/stores/user"
+import { ref } from 'vue'
 
+const user = useUserStore();
 const boardListKey = ref(0);
 const boardDialogKey = ref(0);
 const isBoardDialogOpen = ref(false);
@@ -35,6 +37,7 @@ const refresh = (val: boolean) => {
     <div class="flex flex-col items-center justify-center gap-6 p-6 md:p-10">
         <div class="flex w-full max-w-lg flex-col gap-6">
             <BoardDialog
+                v-if="user.isOwner"
                 :id="boardDialogId"
                 :is-open="isBoardDialogOpen"
                 :key="`board-dialog-${boardDialogKey}`"
