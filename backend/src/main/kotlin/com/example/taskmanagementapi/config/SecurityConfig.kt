@@ -22,8 +22,9 @@ class SecurityConfig(
         .authorizeHttpRequests { auth ->
             auth
                 .requestMatchers(
-                    "/auth/**",
-                    "/ws-task-mnagement/**"
+                    "/auth/login",
+                    "/auth/register",
+                    "/ws-task-management/**"
                 ).permitAll()
                 .anyRequest()
                 .authenticated()
