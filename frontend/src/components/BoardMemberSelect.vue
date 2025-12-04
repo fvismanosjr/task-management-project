@@ -24,13 +24,12 @@ import {
     TagsInputItemText
 } from '@/components/ui/tags-input'
 
-import { Button } from '@/components/ui/button'
-
 import {
     CheckIcon,
     ChevronDown
 } from 'lucide-vue-next'
 
+import { Button } from '@/components/ui/button'
 import { ref, computed, watch } from 'vue'
 import { getUserMembers } from '@/services/boardMember'
 
@@ -54,11 +53,11 @@ const open = ref(false)
 
 getUserMembers().then((response) => {
     userMembers.value = response;
-
-    if (props.members?.length && userMembers.value.length) {
-        selectedMembers.value = props.members;
-    }
 })
+
+if (props.members?.length) {
+    selectedMembers.value = props.members;
+}
 
 const { contains } = useFilter({ sensitivity: 'base' })
 

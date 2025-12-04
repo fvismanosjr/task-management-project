@@ -30,6 +30,7 @@ const emit = defineEmits<{
     (e: "reload-component", value: boolean): void,
 }>();
 
+const boardMemberSelectKey = ref(0);
 const board = ref<BoardWithMembersType>({
     id: 0,
     name: '',
@@ -41,6 +42,7 @@ if (props.id) {
         board.value.id = response.id;
         board.value.name = response.name;
         board.value.members = response.members.map((member: BoardMemberType) => member.username);
+        boardMemberSelectKey.value++;
     })
 }
 
@@ -86,6 +88,7 @@ const submitBoard = async () => {
                 <div class="grid gap-3">
                     <Label for="members">Member</Label>
                     <BoardMemberSelect
+                        :key="`board-member-select-${boardMemberSelectKey}`"
                         :members="board.members"
                         @update:model-value="selectedMembers"
                     />

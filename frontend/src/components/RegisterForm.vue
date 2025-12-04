@@ -58,7 +58,7 @@ const registerUser = async () => {
                             <FieldLabel for="username">
                                 Username
                             </FieldLabel>
-                            <Input v-model="registerForm.username" id="username" type="text" placeholder="johndoe" required />
+                            <Input v-model="registerForm.username" id="username" type="text" placeholder="username" required />
                         </Field>
                         <Field>
                             <FieldLabel for="password">

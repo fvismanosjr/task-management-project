@@ -36,7 +36,7 @@ const loginUser = async () => {
         const result = await response.json();
         const payload = {
             id: result.id,
-            username: result.name,
+            username: result.username,
             role: result.role,
         }
 
@@ -67,7 +67,7 @@ const loginUser = async () => {
                             <FieldLabel for="username">
                                 Username
                             </FieldLabel>
-                            <Input v-model="loginForm.username" id="username" type="text" placeholder="johndoe" required />
+                            <Input v-model="loginForm.username" id="username" type="text" placeholder="username" required />
                         </Field>
                         <Field>
                             <div class="flex items-center">

@@ -1,8 +1,13 @@
 <script setup lang="ts">
+import {
+    Avatar,
+    AvatarFallback,
+} from '@/components/ui/avatar'
 
 import BoardDialog from '@/components/BoardDialog.vue'
 import BoardList from '@/components/BoardList.vue';
 import AppHeader from '@/components/AppHeader.vue';
+import { initials } from '@/helpers/StringHelper';
 import { useUserStore } from "@/stores/user"
 import { ref } from 'vue'
 
@@ -33,7 +38,14 @@ const refresh = (val: boolean) => {
 </script>
 
 <template>
-    <AppHeader />
+    <AppHeader>
+        <template #board-name>Boards</template>
+        <template #board-member>
+            <Avatar>
+                <AvatarFallback>{{ initials(user.user.username) }}</AvatarFallback>
+            </Avatar>
+        </template>
+    </AppHeader>
     <div class="flex flex-col items-center justify-center gap-6 p-6 md:p-10">
         <div class="flex w-full max-w-lg flex-col gap-6">
             <BoardDialog
