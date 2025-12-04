@@ -97,18 +97,23 @@ class BoardService(
         board.name = request.name
         boardRepository.save(board)
 
-        // broadcast
+        // broadcast to new users
         newUsers.map { it.toResponseWith() }.forEach {
             println("broadcasting to user: ${it.id}")
             socketController.broadcastUserBoards(it.id, it.boards)
         }
 
+        // broadcast to old users
         toRemove.forEach { member ->
             val user = member.user.toResponseWith()
 
             println("broadcasting to user: ${user.id}")
             socketController.broadcastUserBoards(user.id, user.boards)
         }
+
+        // broadcast to board
+        println("broadcasting board")
+        socketController.broadcastBoard(id, board.toResponseWith())
 
         return board.toResponse()
     }
