@@ -1,33 +1,40 @@
+export interface UserType {
+    id: number,
+    username: string,
+    role: string,
+}
+
 export interface BoardType {
-    id: number;
-    name: string;
+    id: number,
+    name: string,
 }
 
 export interface BoardWithMembersType {
-    id: number;
-    name: string;
-    members: string[];
+    id: number,
+    name: string,
+    members: string[],
 }
 
 export interface TaskType {
-    id: number;
-    title: string;
-    boardId: number;
+    id: number,
+    title: string,
+    boardId: number,
 }
 
 export interface BoardMemberType {
-    id: number;
-    username: string;
+    id: number,
+    username: string,
 }
 
-export interface TaskTypeResponseType {
-    id: number;
-    title: string;
+export interface TaskResponseType {
+    id: number,
+    title: string,
+    comment?: string,
 }
 
 export interface BoardResponseType {
     id: number,
     name: string,
     members: BoardMemberType[],
-    tasks: TaskTypeResponseType[],
+    tasks: TaskResponseType[],
 }

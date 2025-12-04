@@ -18,12 +18,12 @@ import { Button } from '@/components/ui/button'
 import { ChevronRightIcon, LayoutList, Pencil } from 'lucide-vue-next'
 import ConfirmDialog from '@/components/ConfirmDialog.vue'
 import type { BoardType } from '@/lib/types';
-import { onUnmounted, ref } from 'vue';
-import { useRouter } from 'vue-router';
 import { getBoards } from '@/services/board';
 import { useUserStore } from "@/stores/user"
 import { findMember } from '@/services/boardMember'
 import SocketService from '@/services/socket'
+import { useRouter } from 'vue-router';
+import { onUnmounted, ref } from 'vue';
 
 const user = useUserStore();
 const emit = defineEmits<{

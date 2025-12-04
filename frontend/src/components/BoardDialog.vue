@@ -16,9 +16,9 @@ import { Button } from '@/components/ui/button'
 import { Plus } from "lucide-vue-next"
 import BoardMemberSelect from '@/components/BoardMemberSelect.vue'
 import type { BoardMemberType, BoardWithMembersType } from '@/lib/types'
-import { ref } from 'vue'
-import { findBoard, saveBoard, updateBoard } from '@/services/board'
 import type { AcceptableValue } from 'reka-ui'
+import { findBoard, saveBoard, updateBoard } from '@/services/board'
+import { ref } from 'vue'
 
 const props = defineProps<{
     id?: number,

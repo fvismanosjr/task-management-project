@@ -17,8 +17,8 @@ import { Textarea } from '@/components/ui/textarea'
 import { Plus } from "lucide-vue-next"
 import TaskMemberSelect from '@/components/TaskMemberSelect.vue'
 import { findTask, saveTask, updateTask } from '@/services/task'
-import { ref } from 'vue'
 import { useRoute } from 'vue-router'
+import { ref } from 'vue'
 
 const props = defineProps<{
     id?: number,

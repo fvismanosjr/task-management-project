@@ -1,12 +1,7 @@
 // stores/user.js
 import { defineStore } from 'pinia'
 import { computed, ref } from 'vue'
-
-interface UserType {
-    id: number,
-    username: string,
-    role: string,
-}
+import type { UserType } from '@/lib/types';
 
 export const useUserStore = defineStore('user', () => {
     const user = ref<UserType>({

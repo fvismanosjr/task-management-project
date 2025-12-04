@@ -30,8 +30,8 @@ import {
 } from 'lucide-vue-next'
 
 import { Button } from '@/components/ui/button'
-import { ref, computed, watch } from 'vue'
 import { getUserMembers } from '@/services/boardMember'
+import { ref, computed, watch } from 'vue'
 
 const emit = defineEmits<{
     (e: "update:model-value", value: AcceptableValue): void,

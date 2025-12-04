@@ -17,11 +17,10 @@ import {
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { register } from "@/services/auth"
-import { ref } from "vue"
 import { useRouter } from 'vue-router';
+import { ref } from "vue"
 
 const router = useRouter();
-
 const registerForm = ref({
     username: "",
     password: "",

@@ -16,10 +16,10 @@ import {
 
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
-import { ref } from "vue"
 import { login } from "@/services/auth"
 import { useRouter } from 'vue-router';
 import { useUserStore } from "@/stores/user"
+import { ref } from "vue"
 
 const user = useUserStore();
 const router = useRouter();

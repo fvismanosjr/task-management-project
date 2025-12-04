@@ -12,16 +12,17 @@ import {
     ItemActions,
     ItemContent,
     ItemTitle,
+    ItemDescription,
 } from '@/components/ui/item'
 
 import { Button } from '@/components/ui/button'
 import { LayoutList, Pencil } from 'lucide-vue-next'
 import ConfirmDialog from '@/components/ConfirmDialog.vue'
+import type { TaskResponseType } from '@/lib/types';
 import { ref } from 'vue';
-import type { TaskTypeResponseType } from '@/lib/types';
 
 defineProps<{
-    tasks: TaskTypeResponseType[],
+    tasks: TaskResponseType[],
 }>()
 
 const emit = defineEmits<{
@@ -41,6 +42,7 @@ const openTaskDialog = (id: number) => {
                 <Item variant="outline">
                     <ItemContent>
                         <ItemTitle>{{ task.title }}</ItemTitle>
+                        <ItemDescription>{{ task.comment }}</ItemDescription>
                     </ItemContent>
                     <ItemActions>
                         <Button variant="outline" size="icon-sm" @click.prevent="openTaskDialog(task.id)">
