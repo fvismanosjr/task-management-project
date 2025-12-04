@@ -43,7 +43,7 @@ const loginUser = async () => {
         user.save(payload);
 
         router.push({
-            name: "dashboard",
+            name: "board",
         });
     }
 }

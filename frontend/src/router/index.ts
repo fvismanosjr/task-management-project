@@ -42,7 +42,7 @@ router.beforeEach(async (to) => {
 
     if (to.meta.guestOnly) {
         if (to.name === "login" && authResult) {
-            return { name: "dashboard" };
+            return { name: "board" };
         } else return true;
     }
 
