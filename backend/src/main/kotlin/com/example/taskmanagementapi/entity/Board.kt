@@ -2,7 +2,10 @@ package com.example.taskmanagementapi.entity
 
 import com.example.taskmanagementapi.dto.BoardMemberResponse
 import com.example.taskmanagementapi.dto.BoardResponse
+import com.example.taskmanagementapi.dto.BoardResponseWith
 import com.example.taskmanagementapi.dto.BoardResponseWithMembers
+import com.example.taskmanagementapi.dto.BoardResponseWithRelations
+import com.example.taskmanagementapi.dto.TaskDto
 import jakarta.persistence.CascadeType
 import jakarta.persistence.Column
 import jakarta.persistence.Entity
@@ -23,16 +26,25 @@ class Board(
     @Column(name = "name", nullable = false)
     var name: String,
 
-    @OneToMany(mappedBy = "board", fetch = FetchType.LAZY, cascade = [CascadeType.ALL])
+    @OneToMany(mappedBy = "board", fetch = FetchType.LAZY, cascade = [CascadeType.ALL], orphanRemoval = true)
     var members: MutableList<BoardMember> = mutableListOf(),
 
-    @OneToMany(mappedBy = "board", fetch = FetchType.LAZY, cascade = [CascadeType.ALL])
+    @OneToMany(mappedBy = "board", fetch = FetchType.LAZY, cascade = [CascadeType.ALL], orphanRemoval = true)
     var tasks: MutableList<Task> = mutableListOf()
 ) {
     fun toResponse(): BoardResponse {
         return BoardResponse(
             this.id,
             this.name
+        )
+    }
+
+    fun toResponseWith(): BoardResponseWith {
+        return BoardResponseWith(
+            this.id,
+            this.name,
+            members = this.members.map { it.toResponse() },
+            tasks = this.tasks.map { it.toResponse() }
         )
     }
 
@@ -44,6 +56,25 @@ class Board(
                 BoardMemberResponse(
                     it.id,
                     it.user.username
+                )
+            }
+        )
+    }
+
+    fun toResponseWithRelations(): BoardResponseWithRelations {
+        return BoardResponseWithRelations(
+            this.id,
+            this.name,
+            members = this.members.map {
+                BoardMemberResponse(
+                    it.id,
+                    it.user.username
+                )
+            },
+            tasks = this.tasks.map {
+                TaskDto(
+                    id = it.id,
+                    title = it.title,
                 )
             }
         )

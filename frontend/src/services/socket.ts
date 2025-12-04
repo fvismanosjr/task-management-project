@@ -1,6 +1,10 @@
 import { Client } from '@stomp/stompjs';
 import type { IMessage, StompSubscription } from '@stomp/stompjs';
-import type { BoardType, TaskType } from '@/lib/types';
+import type {
+    BoardType,
+    TaskType,
+    BoardResponseType
+ } from '@/lib/types';
 
 type AnyCallback<T> = (msg: T) => void;
 type UserBoardsCallback = (boards: BoardType[]) => void;
@@ -73,7 +77,7 @@ class SocketService {
     //  BOARD CHANNEL HELPERS
     // ---------------------------
 
-    subscribeToBoard(boardId: number | string, callback: AnyCallback<BoardType>) {
+    subscribeToBoard(boardId: number | string, callback: (updatedBoard: BoardResponseType) => void) {
         const channel = `board.${boardId}`;
         const destination = `/topic/board.${boardId}`;
 

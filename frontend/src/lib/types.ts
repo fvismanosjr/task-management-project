@@ -19,3 +19,15 @@ export interface BoardMemberType {
     id: number;
     username: string;
 }
+
+export interface TaskTypeResponseType {
+    id: number;
+    title: string;
+}
+
+export interface BoardResponseType {
+    id: number,
+    name: string,
+    members: BoardMemberType[],
+    tasks: TaskTypeResponseType[],
+}

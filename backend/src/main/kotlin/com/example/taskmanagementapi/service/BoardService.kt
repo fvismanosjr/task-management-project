@@ -4,6 +4,7 @@ import com.example.taskmanagementapi.controller.SocketController
 import com.example.taskmanagementapi.dto.BoardRequest
 import com.example.taskmanagementapi.dto.BoardResponse
 import com.example.taskmanagementapi.dto.BoardResponseWithMembers
+import com.example.taskmanagementapi.dto.BoardResponseWithRelations
 import com.example.taskmanagementapi.dto.TaskDto
 import com.example.taskmanagementapi.dto.TaskRequest
 import com.example.taskmanagementapi.dto.TaskResponse
@@ -36,22 +37,24 @@ class BoardService(
                         .findById(id)
                         .orElseThrow { Exception("not found") }
 
-    fun findById(
+    fun findBoardById(
         id: Long
     ): Board = boardRepository
                 .findById(id)
                 .orElseThrow { Exception("board not found") }
 
-    fun findAll() = boardRepository.findAll().map { it.toResponse() }
+    fun findAllBoards() = boardRepository.findAll().map { it.toResponse() }
 
     fun find(
         id: Long
-    ): BoardResponseWithMembers = boardRepository
+    ): BoardResponseWithRelations = boardRepository
                         .findById(id)
-                        .map { it.toResponseWithMembers()}
+                        .map { it.toResponseWithRelations() }
                         .orElseThrow { Exception("board not found") }
 
-    fun save(request: BoardRequest): BoardResponse {
+    fun save(
+        request: BoardRequest
+    ): BoardResponse {
 
         val board = boardRepository.save(
             Board(
@@ -59,80 +62,77 @@ class BoardService(
             )
         )
 
-        val boardMembers = userRepository
-                            .findByUsernameIn(request.members)
-                            .map {
-                                BoardMember(board = board, user = it)
-                            }
+        val users = userRepository.findByUsernameIn(request.members)
 
         boardMemberRepository.saveAll(
-            boardMembers
+            users.map { BoardMember(board = board, user = it) }
         )
 
         // broadcast
-        boardMembers.forEach { member ->
-            val boardByUser = userRepository
-                            .findById(member.user.id)
-                            .map { it.toResponseWithBoards() }
-                            .orElseThrow { Exception("not found") }
-            
-            println("userId: ${member.user.id}")
-            socketController.broadcastUserBoards(member.user.id, boardByUser.boards)
+        users.map { it.toResponseWith() }.forEach {
+            println("broadcasting to user: ${it.id}")
+            socketController.broadcastUserBoards(it.id, it.boards)
         }
 
         return board.toResponse()
     }
 
-    fun edit(id: Long, request: BoardRequest): BoardResponse {
+    fun edit(
+        id: Long,
+        request: BoardRequest
+    ): BoardResponse {
 
-        val board = boardRepository.findById(id).orElseThrow()
-        val users = userRepository.findByUsernameIn(request.members)
+        val board = findBoardById(id)
+        val members = board.members
+        val newUsers = userRepository.findByUsernameIn(request.members) // new users
 
-        val currentUsers = board.members.map { it.user }
-        val toRemove = board.members.filter { it.user !in users }
-        board.members.removeAll(toRemove)
+        // remove all current members(user) that was not part of this new users
+        val toRemove = board.members.filter { it.user !in newUsers }
+            board.members.removeAll(toRemove)
 
-        val existingUserIds = currentUsers.map { it.id }.toSet()
-        val toAdd = users.filter { it.id !in existingUserIds }
+        val currentUserIds = board.members.map { it.user.id } // current users
+        val toAdd = newUsers
+                    .filter { it.id !in currentUserIds }
+                    .map { BoardMember(board = board, user = it) }
 
-        toAdd.forEach { user ->
-            board.members.add(BoardMember(board = board, user = user))
-        }
+            board.members.addAll(toAdd)
 
         board.name = request.name
         boardRepository.save(board)
 
         // broadcast
-        users.forEach { user ->
-            val boardByUser = userRepository
-                                .findById(user.id)
-                                .map { it.toResponseWithBoards() }
-                                .orElseThrow { Exception("not found") }
+        newUsers.map { it.toResponseWith() }.forEach {
+            println("broadcasting to user: ${it.id}")
+            socketController.broadcastUserBoards(it.id, it.boards)
+        }
 
-            println("userId: ${user.id}")
-            socketController.broadcastUserBoards(user.id, boardByUser.boards)
+        toRemove.forEach { member ->
+            val user = member.user.toResponseWith()
+
+            println("broadcasting to user: ${user.id}")
+            socketController.broadcastUserBoards(user.id, user.boards)
         }
 
         return board.toResponse()
     }
 
     fun destroy(id: Long) {
-        val board = findById(id)
+        val board = findBoardById(id)
         val members = board.members
 
         boardRepository.delete(
-            findById(id)
+            findBoardById(id)
         )
 
         // broadcast
         members.forEach { member ->
-            val boardByUser = userRepository
-                                .findById(member.user.id)
-                                .map { it.toResponseWithBoards() }
-                                .orElseThrow { Exception("not found") }
+            val user = userRepository
+                        .findById(member.user.id)
+                        .map { it.toResponseWith() }
+                        .orElseThrow { Exception("not found") }
 
-            println("userId: ${member.user.id}")
-            socketController.broadcastUserBoards(member.user.id, boardByUser.boards)
+            println("broadcasting to user: ${member.user.id}")
+            socketController.broadcastUserBoards(member.user.id, user.boards)
         }
     }
 
@@ -152,7 +152,7 @@ class BoardService(
         request: TaskRequest
     ): TaskResponse {
 
-        val board = findById(id)
+        val board = findBoardById(id)
         val task = taskRepository.save(
             Task(
                 board = board,
@@ -164,12 +164,7 @@ class BoardService(
 
         // broadcast
         println("broadcasting save task")
-        socketController.broadcastBoardTasks(id, board.tasks.map {
-            TaskDto(
-                it.id,
-                it.title
-            )
-        })
+        socketController.broadcastBoard(id, board.toResponseWithRelations())
 
         return task.toResponse()
     }
@@ -179,7 +174,7 @@ class BoardService(
         taskId: Long,
         request: TaskRequest
     ): TaskResponse {
-        val board = findById(id)
+        val board = findBoardById(id)
         val task =  taskRepository.save(
             findTaskById(taskId).apply {
                 this.board = board
@@ -202,7 +197,7 @@ class BoardService(
     }
 
     fun destroyTask(id: Long, taskId: Long) {
-        val board = findById(id)
+        val board = findBoardById(id)
 
         taskRepository.delete(findTaskById(taskId))
 

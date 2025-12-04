@@ -39,8 +39,20 @@ data class UserResponse(
     val username: String,
 )
 
+data class UserResponseWith(
+    val id: Long,
+    val username: String,
+    val boards: List<BoardResponse>
+)
+
 data class UserResponseWithBoards(
     val id: Long,
     val username: String,
     val boards: List<BoardResponse>
+)
+
+data class UserResponseWithBoardsRelations(
+    val id: Long,
+    val username: String,
+    val boards: List<BoardResponseWithRelations>
 )

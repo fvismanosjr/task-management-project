@@ -90,8 +90,8 @@ const emitUpdateModelValue = (val: AcceptableValue) => {
             @update:model-value="emitUpdateModelValue"
         >
             <PopoverAnchor class="inline-flex w-full">
-                <TagsInput v-slot="{ modelValue: tags }" v-model="selectedMembers" class="w-full">
-                    <TagsInputItem v-for="item in tags" :key="item.toString()" :value="item.toString()">
+                <TagsInput @update:model-value="emitUpdateModelValue" v-model="selectedMembers" class="w-full">
+                    <TagsInputItem v-for="item in selectedMembers" :key="item.toString()" :value="item.toString()">
                         <TagsInputItemText />
                         <TagsInputItemDelete />
                     </TagsInputItem>

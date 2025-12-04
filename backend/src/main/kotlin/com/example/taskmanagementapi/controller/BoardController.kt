@@ -24,7 +24,7 @@ class BoardController(
 ) {
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
-    fun findAll() = boardService.findAll()
+    fun findAll() = boardService.findAllBoards()
 
     @GetMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)

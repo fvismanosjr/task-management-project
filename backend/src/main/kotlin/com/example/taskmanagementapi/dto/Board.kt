@@ -16,8 +16,22 @@ data class BoardResponse(
     val name: String
 )
 
+data class BoardResponseWith(
+    val id: Long,
+    val name: String,
+    val members: List<BoardMemberResponse>,
+    val tasks: List<TaskResponse>
+)
+
 data class BoardResponseWithMembers(
     val id: Long,
     val name: String,
     val members: List<BoardMemberResponse>
+)
+
+data class BoardResponseWithRelations(
+    val id: Long,
+    val name: String,
+    val members: List<BoardMemberResponse>,
+    val tasks: List<TaskDto>
 )
