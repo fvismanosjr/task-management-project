@@ -7,7 +7,6 @@ import type {
  } from '@/lib/types';
 
 type AnyCallback<T> = (msg: T) => void;
-type UserBoardsCallback = (boards: BoardType[]) => void;
 
 class SocketService {
     private client: Client | null = null;
@@ -115,7 +114,7 @@ class SocketService {
         });
     }
 
-    subscribeToUserBoards(userId: number | string, callback: UserBoardsCallback) {
+    subscribeToUserBoards(userId: number | string, callback: (boards: BoardType[]) => void) {
         const channel = `userBoards.${userId}`;
         const destination = `/topic/user.${userId}.boards`;
 

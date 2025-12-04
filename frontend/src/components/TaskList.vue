@@ -1,5 +1,10 @@
 <script setup lang="ts">
 import {
+    Avatar,
+    AvatarFallback,
+} from '@/components/ui/avatar'
+
+import {
     Empty,
     EmptyDescription,
     EmptyHeader,
@@ -16,8 +21,9 @@ import {
 } from '@/components/ui/item'
 
 import { Button } from '@/components/ui/button'
-import { LayoutList, Pencil } from 'lucide-vue-next'
+import { ClipboardList, Pencil } from 'lucide-vue-next'
 import ConfirmDialog from '@/components/ConfirmDialog.vue'
+import { initials } from '@/helpers/StringHelper';
 import type { TaskResponseType } from '@/lib/types';
 import { ref } from 'vue';
 
@@ -43,6 +49,9 @@ const openTaskDialog = (id: number) => {
                     <ItemContent>
                         <ItemTitle>{{ task.title }}</ItemTitle>
                         <ItemDescription>{{ task.comment }}</ItemDescription>
+                        <Avatar v-if="task.assignee">
+                            <AvatarFallback>{{ initials(task.assignee.username) }}</AvatarFallback>
+                        </Avatar>
                     </ItemContent>
                     <ItemActions>
                         <Button variant="outline" size="icon-sm" @click.prevent="openTaskDialog(task.id)">
@@ -60,11 +69,11 @@ const openTaskDialog = (id: number) => {
         <Empty v-else>
             <EmptyHeader>
                 <EmptyMedia variant="icon">
-                    <LayoutList />
+                    <ClipboardList />
                 </EmptyMedia>
             </EmptyHeader>
-            <EmptyTitle>Board is Empty</EmptyTitle>
-            <EmptyDescription>Create new task and I will show you those</EmptyDescription>
+            <EmptyTitle>You're All Caught Up</EmptyTitle>
+            <EmptyDescription>There are no tasks left for now. Enjoy the free time!</EmptyDescription>
         </Empty>
     </div>
 </template>

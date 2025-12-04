@@ -1,5 +1,10 @@
 <script setup lang="ts">
 import {
+    Avatar,
+    AvatarFallback,
+} from '@/components/ui/avatar'
+
+import {
     Empty,
     EmptyDescription,
     EmptyHeader,
@@ -19,6 +24,7 @@ import { ChevronRightIcon, LayoutList, Pencil } from 'lucide-vue-next'
 import ConfirmDialog from '@/components/ConfirmDialog.vue'
 import type { BoardType } from '@/lib/types';
 import { getBoards } from '@/services/board';
+import { initials } from '@/helpers/StringHelper';
 import { useUserStore } from "@/stores/user"
 import { findMember } from '@/services/boardMember'
 import SocketService from '@/services/socket'
@@ -86,6 +92,15 @@ onUnmounted(() => {
             <Item variant="outline">
                 <ItemContent>
                     <ItemTitle>{{ board.name }}</ItemTitle>
+                    <template v-if="board.members && board.members.length">
+                        <div class="*:data-[slot=avatar]:ring-background flex -space-x-2 *:data-[slot=avatar]:ring-2 *:data-[slot=avatar]:grayscale">
+                            <template v-for="member in board.members.slice(0, 3)" :key="`member-${member.username}`">
+                                <Avatar>
+                                    <AvatarFallback>{{ initials(member.username) }}</AvatarFallback>
+                                </Avatar>
+                            </template>
+                        </div>
+                    </template>
                 </ItemContent>
                 <ItemActions>
                     <template v-if="user.isOwner">
@@ -111,8 +126,8 @@ onUnmounted(() => {
                     <LayoutList />
                 </EmptyMedia>
             </EmptyHeader>
-            <EmptyTitle>No Board Found</EmptyTitle>
-            <EmptyDescription>Create new board and I will show you those</EmptyDescription>
+            <EmptyTitle>No Boards Yet</EmptyTitle>
+            <EmptyDescription>You’ll need a board first! Ask the creator to set one up.</EmptyDescription>
         </Empty>
     </div>
 </template>

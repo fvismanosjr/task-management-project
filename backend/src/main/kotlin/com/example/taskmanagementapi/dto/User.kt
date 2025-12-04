@@ -42,17 +42,11 @@ data class UserResponse(
 data class UserResponseWith(
     val id: Long,
     val username: String,
-    val boards: List<BoardResponse>
+    val boards: List<BoardResponseWith>
 )
 
 data class UserResponseWithBoards(
     val id: Long,
     val username: String,
     val boards: List<BoardResponse>
-)
-
-data class UserResponseWithBoardsRelations(
-    val id: Long,
-    val username: String,
-    val boards: List<BoardResponseWithRelations>
 )

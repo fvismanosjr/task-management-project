@@ -37,7 +37,7 @@ class Task(
             this.id,
             this.title,
             this.comment,
-            this.assignee.id
+            assignee = this.assignee.toResponse()
         )
     }
 }

@@ -1,6 +1,6 @@
 package com.example.taskmanagementapi.service
 
-import com.example.taskmanagementapi.dto.UserResponseWithBoards
+import com.example.taskmanagementapi.dto.UserResponseWith
 import com.example.taskmanagementapi.repository.UserRepository
 import org.springframework.stereotype.Service
 
@@ -12,8 +12,8 @@ class UserService(
 
     fun find(
         id: Long
-    ): UserResponseWithBoards = userRepository
+    ): UserResponseWith = userRepository
         .findById(id)
-        .map { it.toResponseWithBoards() }
+        .map { it.toResponseWith() }
         .orElseThrow { Exception("not found") }
 }

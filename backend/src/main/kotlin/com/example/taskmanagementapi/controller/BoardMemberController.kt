@@ -1,5 +1,6 @@
 package com.example.taskmanagementapi.controller
 
+import com.example.taskmanagementapi.dto.UserResponseWith
 import com.example.taskmanagementapi.service.UserService
 import org.springframework.http.HttpStatus
 import org.springframework.validation.annotation.Validated
@@ -22,6 +23,6 @@ class BoardMemberController(
     @GetMapping("/{id}")
     fun findBoards(
         @PathVariable id: Long
-    ) = userService.find(id)
+    ): UserResponseWith = userService.find(id)
 
 }

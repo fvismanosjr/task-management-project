@@ -42,6 +42,7 @@ const task = ref({
 if (props.id) {
     findTask(routeId, props.id).then((response) => {
         task.value = response;
+        task.value.assignee = response.assignee.id;
     })
 }
 

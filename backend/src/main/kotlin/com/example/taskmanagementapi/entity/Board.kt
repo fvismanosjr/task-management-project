@@ -1,11 +1,7 @@
 package com.example.taskmanagementapi.entity
 
-import com.example.taskmanagementapi.dto.BoardMemberResponse
 import com.example.taskmanagementapi.dto.BoardResponse
 import com.example.taskmanagementapi.dto.BoardResponseWith
-import com.example.taskmanagementapi.dto.BoardResponseWithMembers
-import com.example.taskmanagementapi.dto.BoardResponseWithRelations
-import com.example.taskmanagementapi.dto.TaskDto
 import jakarta.persistence.CascadeType
 import jakarta.persistence.Column
 import jakarta.persistence.Entity
@@ -55,38 +51,6 @@ class Board(
             this.name,
             members = this.members.map { it.toResponse() },
             tasks = this.tasks.map { it.toResponse() }
-        )
-    }
-
-    fun toResponseWithMembers(): BoardResponseWithMembers {
-        return BoardResponseWithMembers(
-            this.id,
-            this.name,
-            this.members.map {
-                BoardMemberResponse(
-                    it.id,
-                    it.user.username
-                )
-            }
-        )
-    }
-
-    fun toResponseWithRelations(): BoardResponseWithRelations {
-        return BoardResponseWithRelations(
-            this.id,
-            this.name,
-            members = this.members.map {
-                BoardMemberResponse(
-                    it.id,
-                    it.user.username
-                )
-            },
-            tasks = this.tasks.map {
-                TaskDto(
-                    id = it.id,
-                    title = it.title,
-                )
-            }
         )
     }
 }

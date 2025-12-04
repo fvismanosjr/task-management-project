@@ -2,7 +2,6 @@ package com.example.taskmanagementapi.service
 
 import com.example.taskmanagementapi.controller.SocketController
 import com.example.taskmanagementapi.dto.BoardRequest
-import com.example.taskmanagementapi.dto.BoardResponse
 import com.example.taskmanagementapi.dto.BoardResponseWith
 import com.example.taskmanagementapi.dto.TaskRequest
 import com.example.taskmanagementapi.dto.TaskResponse
@@ -41,8 +40,7 @@ class BoardService(
                 .findById(id)
                 .orElseThrow { Exception("board not found") }
 
-    fun findAllBoards() = boardRepository.findAll().map { it.toResponse() }
-
+    fun findAllBoards() = boardRepository.findAll().map { it.toResponseWith() }
     fun find(
         id: Long
     ): BoardResponseWith = boardRepository
@@ -52,19 +50,16 @@ class BoardService(
 
     fun save(
         request: BoardRequest
-    ): BoardResponse {
+    ): BoardResponseWith {
 
-        val board = boardRepository.save(
-            Board(
-                name = request.name
-            )
-        )
-
+        val board = Board(name = request.name)
         val users = userRepository.findByUsernameIn(request.members)
 
-        boardMemberRepository.saveAll(
-            users.map { BoardMember(board = board, user = it) }
-        )
+        users.forEach { user ->
+            board.members.add(BoardMember(board = board, user = user))
+        }
+
+        val savedBoard = boardRepository.save(board)  // cascade saves members
 
         // broadcast
         users.map { it.toResponseWith() }.forEach {
@@ -72,13 +67,13 @@ class BoardService(
             socketController.broadcastUserBoards(it.id, it.boards)
         }
 
-        return board.toResponse()
+        return savedBoard.toResponseWith()
     }
 
     fun edit(
         id: Long,
         request: BoardRequest
-    ): BoardResponse {
+    ): BoardResponseWith {
 
         val board = findBoardById(id)
         val newUsers = userRepository.findByUsernameIn(request.members) // new users
@@ -115,7 +110,7 @@ class BoardService(
         println("broadcasting board")
         socketController.broadcastBoard(id, board.toResponseWith())
 
-        return board.toResponse()
+        return board.toResponseWith()
     }
 
     fun destroy(id: Long) {

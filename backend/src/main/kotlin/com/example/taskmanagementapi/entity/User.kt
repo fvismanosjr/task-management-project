@@ -3,7 +3,6 @@ package com.example.taskmanagementapi.entity
 import com.example.taskmanagementapi.dto.UserResponse
 import com.example.taskmanagementapi.dto.UserResponseWith
 import com.example.taskmanagementapi.dto.UserResponseWithBoards
-import com.example.taskmanagementapi.dto.UserResponseWithBoardsRelations
 import jakarta.persistence.Column
 import jakarta.persistence.Entity
 import jakarta.persistence.FetchType
@@ -45,7 +44,7 @@ class User(
             this.id,
             this.username,
             this.boardMember.map {
-                it.board.toResponse()
+                it.board.toResponseWith()
             }
         )
     }
@@ -56,16 +55,6 @@ class User(
             this.username,
             boards = this.boardMember.map {
                 it.board.toResponse()
-            }
-        )
-    }
-
-    fun toResponseWithBoardsRelations(): UserResponseWithBoardsRelations {
-        return UserResponseWithBoardsRelations(
-            this.id,
-            this.username,
-            boards = this.boardMember.map {
-                it.board.toResponseWithRelations()
             }
         )
     }

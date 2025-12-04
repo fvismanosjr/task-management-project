@@ -7,6 +7,7 @@ export interface UserType {
 export interface BoardType {
     id: number,
     name: string,
+    members?: BoardMemberType[]
 }
 
 export interface BoardWithMembersType {
@@ -30,6 +31,7 @@ export interface TaskResponseType {
     id: number,
     title: string,
     comment?: string,
+    assignee?: BoardMemberType,
 }
 
 export interface BoardResponseType {
