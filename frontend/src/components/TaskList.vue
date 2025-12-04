@@ -17,49 +17,21 @@ import {
 import { Button } from '@/components/ui/button'
 import { LayoutList, Pencil } from 'lucide-vue-next'
 import ConfirmDialog from '@/components/ConfirmDialog.vue'
-import { onUnmounted, ref } from 'vue';
-import { useRoute } from 'vue-router'
-import { getTasks } from '@/services/task'
-import SocketService from '@/services/socket'
-import type { TaskType } from '@/lib/types';
+import { ref } from 'vue';
+import type { TaskTypeResponseType } from '@/lib/types';
+
+defineProps<{
+    tasks: TaskTypeResponseType[],
+}>()
 
 const emit = defineEmits<{
     (e: "update:open-dialog", value: number): void
 }>();
 
-const route = useRoute();
 const confirmDialogKey = ref(0);
-const tasks = ref<TaskType[]>([]);
-
-getTasks(Number(route.params.id)).then((response) => {
-    tasks.value = response;
-
-    SocketService.connect(() => {
-        SocketService.subscribeToTasks(Number(route.params.id), (newTasks: TaskType[]) => {
-            tasks.value = newTasks;
-        });
-    });
-})
-
 const openTaskDialog = (id: number) => {
     emit("update:open-dialog", id);
 }
-
-const refresh = async (val: boolean) => {
-    if (val) {
-        tasks.value = [];
-
-        await getTasks(Number(route.params.id)).then((response) => {
-            tasks.value = response;
-        });
-
-        confirmDialogKey.value++;
-    }
-}
-
-onUnmounted(() => {
-    SocketService.disconnect();
-})
 </script>
 
 <template>
@@ -78,7 +50,6 @@ onUnmounted(() => {
                             :id="task.id"
                             :type="'task'"
                             :key="`confirm-dialog-${task.id}-${confirmDialogKey}`"
-                            @reload-component="refresh"
                         />
                     </ItemActions>
                 </Item>

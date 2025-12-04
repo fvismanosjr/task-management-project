@@ -1,6 +1,7 @@
 package com.example.taskmanagementapi.controller
 
 import com.example.taskmanagementapi.dto.BoardResponse
+import com.example.taskmanagementapi.dto.BoardResponseWith
 import com.example.taskmanagementapi.dto.BoardResponseWithRelations
 import com.example.taskmanagementapi.dto.TaskDto
 import org.springframework.messaging.handler.annotation.MessageMapping
@@ -16,7 +17,7 @@ class SocketController(
         messagingTemplate.convertAndSend("/topic/user.$userId.boards", boards)
     }
 
-    fun broadcastBoard(boardId: Long, board: BoardResponseWithRelations) {
+    fun broadcastBoard(boardId: Long, board: BoardResponseWith) {
         messagingTemplate.convertAndSend("/topic/board.$boardId", board)
     }
 

@@ -26,10 +26,20 @@ class Board(
     @Column(name = "name", nullable = false)
     var name: String,
 
-    @OneToMany(mappedBy = "board", fetch = FetchType.LAZY, cascade = [CascadeType.ALL], orphanRemoval = true)
+    @OneToMany(
+        mappedBy = "board",
+        fetch = FetchType.LAZY,
+        cascade = [CascadeType.ALL],
+        orphanRemoval = true
+    )
     var members: MutableList<BoardMember> = mutableListOf(),
 
-    @OneToMany(mappedBy = "board", fetch = FetchType.LAZY, cascade = [CascadeType.ALL], orphanRemoval = true)
+    @OneToMany(
+        mappedBy = "board",
+        fetch = FetchType.LAZY,
+        cascade = [CascadeType.ALL],
+        orphanRemoval = true
+    )
     var tasks: MutableList<Task> = mutableListOf()
 ) {
     fun toResponse(): BoardResponse {

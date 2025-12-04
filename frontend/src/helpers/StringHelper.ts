@@ -4,7 +4,7 @@ export const ucwords = (str: string) => {
             .replace(/\b[a-z]/g, (letter) => letter.toUpperCase());
 }
 
-export const initials = (str: string, min: number = 3) => {
+export const initials = (str: string, min: number = 1) => {
     return String(str)
             .trim()
             .split(/\s+/)

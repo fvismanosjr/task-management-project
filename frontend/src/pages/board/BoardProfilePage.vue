@@ -9,8 +9,10 @@ import TaskList from '@/components/TaskList.vue';
 import TaskDialog from '@/components/TaskDialog.vue'
 import { initials } from '@/helpers/StringHelper';
 import { findBoard } from '@/services/board';
+import type { BoardResponseType } from '@/lib/types';
+import SocketService from '@/services/socket'
 import { useRoute } from 'vue-router';
-import { ref } from 'vue';
+import { onUnmounted, ref } from 'vue';
 
 const taskListKey = ref(0);
 const taskDialogKey = ref(0);
@@ -18,16 +20,22 @@ const isTaskDialogOpen = ref(false);
 const taskDialogId = ref(0);
 
 const route = useRoute();
-const board = ref({
+const boardId = Number(route.params.id);
+const board = ref<BoardResponseType>({
+    id: 0,
     name: "",
-    members: [{
-        id: 0,
-        username: ""
-    }]
+    members: [],
+    tasks: [],
 });
 
-findBoard(Number(route.params.id)).then((response) => {
+findBoard(boardId).then((response) => {
     board.value = response;
+
+    SocketService.connect(() => {
+        SocketService.subscribeToBoard(boardId, (updatedBoard: BoardResponseType) => {
+            board.value = updatedBoard;
+        });
+    });
 })
 
 const updateTaskStatus = (status: boolean) => {
@@ -47,6 +55,10 @@ const refresh = (val: boolean) => {
         taskListKey.value++;
     }
 }
+
+onUnmounted(() => {
+    SocketService.disconnect();
+})
 </script>
 
 <template>
@@ -75,7 +87,7 @@ const refresh = (val: boolean) => {
                 @update:open="updateTaskStatus"
             />
             <TaskList
-                :key="`task-list-${taskListKey}`"
+                :tasks="board.tasks"
                 @update:open-dialog="openDialog"
             />
         </div>

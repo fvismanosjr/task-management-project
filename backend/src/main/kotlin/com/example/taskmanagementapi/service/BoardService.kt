@@ -3,9 +3,7 @@ package com.example.taskmanagementapi.service
 import com.example.taskmanagementapi.controller.SocketController
 import com.example.taskmanagementapi.dto.BoardRequest
 import com.example.taskmanagementapi.dto.BoardResponse
-import com.example.taskmanagementapi.dto.BoardResponseWithMembers
-import com.example.taskmanagementapi.dto.BoardResponseWithRelations
-import com.example.taskmanagementapi.dto.TaskDto
+import com.example.taskmanagementapi.dto.BoardResponseWith
 import com.example.taskmanagementapi.dto.TaskRequest
 import com.example.taskmanagementapi.dto.TaskResponse
 import com.example.taskmanagementapi.entity.Board
@@ -47,9 +45,9 @@ class BoardService(
 
     fun find(
         id: Long
-    ): BoardResponseWithRelations = boardRepository
+    ): BoardResponseWith = boardRepository
                         .findById(id)
-                        .map { it.toResponseWithRelations() }
+                        .map { it.toResponseWith() }
                         .orElseThrow { Exception("board not found") }
 
     fun save(
@@ -83,7 +81,6 @@ class BoardService(
     ): BoardResponse {
 
         val board = findBoardById(id)
-        val members = board.members
         val newUsers = userRepository.findByUsernameIn(request.members) // new users
 
         // remove all current members(user) that was not part of this new users
@@ -163,8 +160,8 @@ class BoardService(
         )
 
         // broadcast
-        println("broadcasting save task")
-        socketController.broadcastBoard(id, board.toResponseWithRelations())
+        println("broadcasting board")
+        socketController.broadcastBoard(id, board.toResponseWith())
 
         return task.toResponse()
     }
@@ -185,13 +182,8 @@ class BoardService(
         )
 
         // broadcast
-        println("broadcasting edit task")
-        socketController.broadcastBoardTasks(id, board.tasks.map {
-            TaskDto(
-                it.id,
-                it.title
-            )
-        })
+        println("broadcasting board")
+        socketController.broadcastBoard(id, board.toResponseWith())
 
         return task.toResponse()
     }
@@ -202,12 +194,7 @@ class BoardService(
         taskRepository.delete(findTaskById(taskId))
 
         // broadcast
-        println("broadcasting delete task")
-        socketController.broadcastBoardTasks(id, board.tasks.map {
-            TaskDto(
-                it.id,
-                it.title
-            )
-        })
+        println("broadcasting board")
+        socketController.broadcastBoard(id, board.toResponseWith())
     }
 }
