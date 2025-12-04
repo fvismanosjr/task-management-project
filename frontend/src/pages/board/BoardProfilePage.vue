@@ -9,6 +9,7 @@ import TaskList from '@/components/TaskList.vue';
 import TaskDialog from '@/components/TaskDialog.vue'
 import { initials } from '@/helpers/StringHelper';
 import { findBoard } from '@/services/board';
+import { Button } from '@/components/ui/button';
 import type { BoardResponseType } from '@/lib/types';
 import SocketService from '@/services/socket'
 import { useRoute } from 'vue-router';
@@ -79,13 +80,19 @@ onUnmounted(() => {
 
     <div class="flex flex-col items-center justify-center gap-6 p-6 md:p-10">
         <div class="flex w-full max-w-lg flex-col gap-6">
-            <TaskDialog
-                :id="taskDialogId"
-                :is-open="isTaskDialogOpen"
-                :key="`task-dialog-${taskDialogKey}`"
-                @reload-component="refresh"
-                @update:open="updateTaskStatus"
-            />
+            <div class="flex align-middle justify-center gap-3">
+                <Button size="sm" variant="outline" @click.prevent="$router.push({ name: 'board' })">
+                    Boards
+                </Button>
+                <TaskDialog
+                    :id="taskDialogId"
+                    :is-open="isTaskDialogOpen"
+                    :key="`task-dialog-${taskDialogKey}`"
+                    @reload-component="refresh"
+                    @update:open="updateTaskStatus"
+                />
+            </div>
+
             <TaskList
                 :tasks="board.tasks"
                 @update:open-dialog="openDialog"

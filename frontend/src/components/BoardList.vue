@@ -28,7 +28,6 @@ import { initials } from '@/helpers/StringHelper';
 import { useUserStore } from "@/stores/user"
 import { findMember } from '@/services/boardMember'
 import SocketService from '@/services/socket'
-import { useRouter } from 'vue-router';
 import { onUnmounted, ref } from 'vue';
 
 const user = useUserStore();
@@ -37,7 +36,6 @@ const emit = defineEmits<{
 }>();
 
 const confirmDialogKey = ref(0);
-const router = useRouter();
 const boards = ref<BoardType[]>([]);
 
 if (user.isOwner) {
@@ -58,15 +56,6 @@ if (user.isOwner) {
 
 const openBoardDialog = (id: number) => {
     emit("update:open-dialog", id);
-}
-
-const goToBoard = (id: number) => {
-    router.push({
-        name: "board-profile",
-        params: {
-            id: id
-        }
-    })
 }
 
 const refresh = async (val: boolean) => {
@@ -114,7 +103,7 @@ onUnmounted(() => {
                             @reload-component="refresh"
                         />
                     </template>
-                    <Button variant="outline" size="icon-sm" @click.prevent="goToBoard(board.id)">
+                    <Button variant="outline" size="icon-sm" @click.prevent="$router.push({ name: 'board-profile', params: { id: board.id } })">
                         <ChevronRightIcon />
                     </Button>
                 </ItemActions>

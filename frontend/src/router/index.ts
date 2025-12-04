@@ -26,7 +26,7 @@ const router = createRouter({
         },
         {
             path: "/board",
-            name: "dashboard",
+            name: "board",
             component: BoardPage
         },
         {
